@@ -1,0 +1,44 @@
+================================================================================
+                            FAKE NEWS DETECTION REPORT
+================================================================================
+
+
+2. SYSTEM DESIGN AND FUNCTIONALITY
+===============================================================================
+
+
+2.1 System Overview
+-------------------------------------------------------------------------------
+
+The fake news detection system functions as an automated binary classifier that processes raw news article text and predicts whether the content represents authentic news or fabricated misinformation. The system accepts text input from various sources, performs preprocessing steps including text cleaning, tokenization, and sequence encoding, then feeds the processed input through a neural network that outputs a probability value indicating the likelihood that the article is fake news. This probability can be thresholded at 0.5 to produce a binary classification decision, or presented as a confidence score to assist human reviewers in prioritizing articles for manual verification.
+
+
+2.2 Model Architectures
+-------------------------------------------------------------------------------
+
+Two primary deep learning architectures are implemented in this system: a Bidirectional Long Short-Term Memory network with attention mechanism (BiLSTM-Attention) and a Text Convolutional Neural Network (TextCNN). The BiLSTM architecture is chosen for its ability to capture sequential dependencies and long-range patterns in text data through gating mechanisms that address the vanishing gradient problem. The bidirectional variant processes input in both forward and backward directions, capturing contextual information from past and future tokens simultaneously. The incorporated attention mechanism further enhances the model by computing importance weights for each position in the sequence, allowing the network to focus on the most relevant portions of text while potentially ignoring less critical background information.
+
+The TextCNN architecture represents a complementary approach that views text as a two-dimensional representation and applies multiple convolutional filters of varying kernel sizes across the sequence. Each filter learns to detect specific local patterns or n-grams, with different kernel sizes enabling the model to capture patterns at multiple granularities simultaneously. Unlike the sequential processing of the LSTM, the CNN processes all positions in parallel, making it computationally more efficient. The choice to implement both architectures is motivated by their different theoretical assumptions about text structure—the LSTM excels at capturing grammatical structure and long-range dependencies, while the CNN is optimized for detecting local patterns with faster training speeds.
+
+
+2.3 Training and Evaluation
+-------------------------------------------------------------------------------
+
+Both models employ a learnable embedding layer that maps vocabulary words to 200-dimensional vectors, serving as the bridge between discrete tokens and continuous neural network inputs. The classification components follow a similar structure with fully connected layers that compress features to 128 units with ReLU activation, introduce dropout regularization of 0.35 to prevent overfitting, and produce a single logit value passed through a sigmoid function for the final probability output. The system uses Binary Cross-Entropy loss with the AdamW optimizer, and incorporates exploration of Focal Loss as an alternative to address potential class imbalance.
+
+Comprehensive evaluation capabilities include recording training histories and generating visualizations such as training curves and confusion matrices. The system computes multiple performance metrics to provide thorough assessment of classifier behavior. The primary evaluation metrics used in this project are:
+
+(1) Accuracy—the proportion of correctly classified instances among all predictions, calculated as (True Positives + True Negatives) / (Total Samples).
+
+(2) Precision—the proportion of predicted fake news cases that are actually fake, calculated as True Positives / (True Positives + False Positives), indicating how reliable positive predictions are.
+
+(3) Recall—the proportion of actual fake news cases that are correctly identified, calculated as True Positives / (True Positives + False Negatives), indicating how many fake news cases are captured by the model.
+
+(4) F1 Score—the harmonic mean of precision and recall, calculated as 2 × (Precision × Recall) / (Precision + Recall), providing a balanced measure that considers both false positives and false negatives.
+
+(5) ROC AUC—the Area Under the Receiver Operating Characteristic curve, representing the model's ability to distinguish between classes across all possible threshold values.
+
+(6) PR AUC—the Area Under the Precision-Recall curve, particularly useful for imbalanced datasets as it focuses on the performance with respect to the positive (fake news) class.
+
+
+================================================================================

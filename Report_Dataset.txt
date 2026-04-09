@@ -1,0 +1,153 @@
+================================================================================
+                            FAKE NEWS DETECTION REPORT
+================================================================================
+
+
+3. DATASET PREPROCESSING
+===============================================================================
+
+
+3.1 Dataset Description
+-------------------------------------------------------------------------------
+
+The dataset used in this project consists of 4,749 unique news articles that have been labeled as either real or fake. Each entry contains a text field with article content and a binary label field indicating the ground truth classification. The dataset provides a valuable resource for training machine learning models to detect fake news, with applications including training models for real-time detection of misinformation in social media posts and news articles, developing NLP algorithms to identify linguistic patterns indicative of fake news, creating explainable models that provide insights into classification decisions, and evaluating the effectiveness of different feature engineering techniques and machine learning algorithms.
+
+
+3.2 Exploratory Data Analysis
+-------------------------------------------------------------------------------
+
+Exploratory data analysis provides insights into the characteristics of the dataset that inform model design and hyperparameter selection. The class distribution analysis reveals a balance between real and fake news samples, with approximately 52% of articles labeled as real news and 48% as fake news based on visualization results. This relatively balanced distribution suggests that standard Binary Cross-Entropy loss should perform adequately without requiring specialized techniques like Focal Loss, though a slight imbalance was still investigated through comparative experiments to evaluate whether alternative loss functions could provide benefits.
+
+[Insert Figure: Class Distribution bar chart showing the count of real news vs fake news in the full dataset, displaying the balanced nature of the two classes]
+
+Text length analysis shows that articles vary considerably in their word count, with the shortest articles containing just a few tokens and the longest extending beyond 200 tokens. The distribution of article lengths, as visualized in the histogram, appears to follow a right-skewed pattern where many articles cluster around a moderate length range with a long tail of outliers. This observation informed the selection of 220 tokens as the maximum sequence length, ensuring that the majority of articles are fully represented while truncating only the longest outliers. Understanding the length distribution is crucial for setting appropriate sequence truncation parameters that balance information retention with computational efficiency.
+
+[Insert Figure: Text Length Distribution histogram showing the distribution of article lengths in terms of the number of tokens across all samples in the dataset]
+
+Sample text analysis by class provides qualitative understanding of the linguistic differences between authentic and fabricated news. Real news articles typically exhibit more formal writing styles, proper attribution to sources, and balanced presentation of facts. In contrast, fake news articles often display characteristics such as sensationalist language, exaggerated claims, emotional appeals, or lack of credible sources. These stylistic and content differences are what the deep learning models learn to recognize as discriminative patterns. The sample texts saved during EDA serve as reference points for understanding model predictions and debugging potential errors in the classification pipeline.
+
+[Insert Figure: Sample texts by class showing representative examples of real news and fake news articles, highlighting the linguistic and stylistic differences between the two categories]
+
+
+3.3 Data Cleaning
+-------------------------------------------------------------------------------
+
+3.3.1 Text Normalization
+
+Text normalization is the first step in preprocessing pipeline and involves several critical transformations to clean raw article content. The first step converts all text to lowercase to ensure consistency and reduce vocabulary size by treating identical words with different capitalizations as the same token. URLs and web addresses are systematically removed using regular expressions, as these elements typically do not contribute to semantic meaning relevant for fake news detection and may introduce noise into the vocabulary. Special characters are filtered to retain only alphanumeric characters and apostrophes, with multiple consecutive spaces replaced by single spaces to normalize whitespace. These cleaning steps reduce the vocabulary size while preserving the meaningful linguistic content that indicates credibility. The text cleaning function is implemented as follows:
+
+```python
+def clean_text(text):
+    text = "" if pd.isna(text) else str(text)
+    text = text.lower()                              # Convert to lowercase
+    text = re.sub(r"http\S+|www\.\S+", " ", text)   # Remove URLs
+    text = re.sub(r"[^a-z0-9\s']", " ", text)   # Remove special chars
+    text = re.sub(r"\s+", " ", text).strip()    # Normalize whitespace
+    return text
+```
+
+
+3.3.2 Tokenization
+-------------------------------------------------------------------------------
+
+Tokenization converts the cleaned text into individual word units using a regular expression pattern matching. Each article is broken down into a sequence of tokens that serve as the basic units for vocabulary construction and subsequent numerical encoding. The core tokenization function is implemented as follows:
+
+```python
+def tokenize(text):
+    return re.findall(r"[a-z0-9']+", text.lower())
+```
+
+This approach identifies all alphanumeric sequences followed by apostrophes as individual tokens, allowing the system to handle contractions and possessive forms appropriately. The lowercase conversion ensures that the same word with different capitalizations is treated as a single token, reducing vocabulary redundancy.
+
+
+3.3.3 Vocabulary Construction
+-------------------------------------------------------------------------------
+
+The vocabulary is built from the training set with a maximum size of 30,000 tokens and a minimum frequency threshold of 2 occurrences. This filtering ensures that common words are included while rare or noise tokens that appear fewer than twice are excluded from the vocabulary. The vocabulary building process is implemented as follows:
+
+```python
+def build_vocab(texts, max_vocab_size=30000, min_freq=2):
+    counter = Counter()
+    for text in texts:
+        counter.update(tokenize(text))
+
+    vocab = {"<PAD>": 0, "<UNK>": 1}
+    for token, freq in counter.most_common():
+        if freq < min_freq:
+            continue
+        if token in vocab:
+            continue
+        vocab[token] = len(vocab)
+        if len(vocab) >= max_vocab_size:
+            break
+    return vocab
+```
+
+Special tokens are added to the vocabulary: `<PAD>` with ID 0 for padding sequences to a uniform length, and `<UNK>` with ID 1 for unknown words not present in the vocabulary during inference. This design allows the system to handle out-of-vocabulary tokens gracefully while maintaining consistent input dimensions across all samples.
+
+[Insert Figure: Vocabulary size visualization showing the distribution of token frequencies, with the most common words at the top and the rare words at the bottom of the distribution]
+
+
+3.3.4 Sequence Encoding
+-------------------------------------------------------------------------------
+
+Sequence encoding transforms tokenized text into fixed-length numerical vectors for neural network input. Each article is converted to a sequence of token IDs using the vocabulary lookup, with a maximum sequence length of 220 tokens. Articles shorter than 220 tokens are padded with `<PAD>` tokens to reach the required length, while longer articles are truncated to 220 tokens, keeping only the first 220 tokens. The sequence encoding function is implemented as follows:
+
+```python
+def encode_text(text, vocab, max_len=220):
+    tokens = tokenize(text)
+    ids = [vocab.get(tok, vocab["<UNK>"]) for tok in tokens[:max_len]]
+    length = len(ids)
+    if length < max_len:
+        ids += [vocab["<PAD>"]] * (max_len - length)
+    return ids, min(length, max_len)
+```
+
+This standardization ensures consistent input dimensions for all samples, which is necessary for efficient batch processing in neural networks. The choice of 220 as the maximum length was informed by examining the distribution of article lengths to ensure that the majority of articles are fully represented while maintaining computational efficiency.
+
+[Insert Figure: Sequence encoding visualization showing examples of raw text, tokenized output, and encoded sequence representation, illustrating the transformation from human-readable text to machine-processable numerical vectors]
+
+
+3.4 Dataset Split
+-------------------------------------------------------------------------------
+
+After preprocessing, the dataset is divided into three subsets following a stratified sampling strategy to maintain consistent class distributions across all splits. This approach ensures that each subset accurately reflects the overall class balance and prevents potential bias that could arise from random splitting. The training set provides the primary data for model learning, the validation set is used for hyperparameter tuning and early stopping decisions, and the test set serves as a held-out set for final unbiased performance evaluation.
+
+The dataset distribution across the three subsets is summarized in the following table:
+
++----------------+-------+----------+----------+
+| Subset         | Count | Percentage | Purpose  |
++----------------+-------+----------+----------+
+| Training        | 3,324 | 70.0%     | Model learning and weight updates  |
+| Validation      | 712   | 15.0%     | Hyperparameter tuning and early stopping  |
+| Test           | 713   | 15.0%     | Final unbiased evaluation  |
++----------------+-------+----------+----------+
+| Total           | 4,749 | 100.0%    |  |
++----------------+-------+----------+----------+
+
+The data splitting is implemented using scikit-learn's `train_test_split` function with stratified sampling:
+
+```python
+def split_data(df, test_size=0.15, val_size=0.15, seed=42):
+    train_df, temp_df = train_test_split(
+        df,
+        test_size=(test_size + val_size),
+        random_state=seed,
+        stratify=df["label"]
+    )
+    relative_test = test_size / (test_size + val_size)
+    val_df, test_df = train_test_split(
+        temp_df,
+        test_size=relative_test,
+        random_state=seed,
+        stratify=temp_df["label"]
+    )
+    return train_df, val_df, test_df
+```
+
+After initial loading, the dataset undergoes additional cleaning procedures to remove missing values and duplicate entries based on the combination of text and label pairs. This preprocessing ensures data quality before model training and prevents potential issues that could arise from redundant or corrupted data points.
+
+[Insert Figure: Pie chart or bar chart showing the proportion of training, validation, and test sets within the total dataset]
+
+
+================================================================================

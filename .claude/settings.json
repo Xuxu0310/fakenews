@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc Fake_News_Detection_Report.txt -o Fake_News_Detection_Report_EN.pdf --pdf-engine=xelatex -V mainfont=\"Arial\")",
+      "Bash(git init:*)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

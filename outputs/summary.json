@@ -1,0 +1,18 @@
+{
+  "device": "cuda",
+  "samples": 4749,
+  "train_samples": 3324,
+  "val_samples": 712,
+  "test_samples": 713,
+  "vocab_size": 30000,
+  "label_mapping": {
+    "0": 0,
+    "1": 1
+  },
+  "baseline_test_accuracy": 0.7461430575035063,
+  "baseline_test_f1": 0.6457925636007827,
+  "baseline_test_precision": 0.717391304347826,
+  "baseline_test_recall": 0.5871886120996441,
+  "baseline_test_roc_auc": 0.8202929352840386,
+  "baseline_test_pr_auc": 0.7741173758548046
+}
