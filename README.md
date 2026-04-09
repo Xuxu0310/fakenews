@@ -140,6 +140,36 @@ fakenews/
 - **Attention Mechanism**: Computes importance weights for each token position
 - **Classifier**: Fully connected layers with dropout regularization
 
+#### Hyperparameter Analysis
+
+**Loss Function Comparison**
+
+![Loss Function Comparison](outputs/loss_function_comparison.png)
+
+![Loss Function Summary](outputs/loss_function_comparison_summary.png)
+
+The BiLSTM-Attention model was evaluated with two loss functions: Binary Cross-Entropy (BCE) and Focal Loss. BCE Loss achieved better performance (~75% test accuracy) compared to Focal Loss (~67% test accuracy), indicating that the class imbalance in the dataset is mild and does not require specialized loss functions.
+
+**Learning Rate Ablation**
+
+![Learning Rate Comparison](outputs/learning_rate_comparison.png)
+
+![Learning Rate Summary](outputs/learning_rate_comparison_summary.png)
+
+Four learning rates were tested: 0.0001, 0.001, 0.01, and 0.1. The learning rate of 0.001 achieved optimal performance (~75% test accuracy) with stable convergence. Lower rates (0.0001) resulted in underfitting, while higher rates (0.01, 0.1) led to overfitting and instability.
+
+**Training Curves**
+
+![BiLSTM Training Curves](outputs/baseline_training_curves.png)
+
+The baseline BiLSTM-Attention model shows smooth convergence over 6 epochs, with training loss decreasing steadily and validation accuracy improving before plateauing. Early stopping prevents overfitting by restoring the best model state based on validation performance.
+
+**Model Evaluation**
+
+![Confusion Matrix](outputs/baseline_confusion_matrix.png)
+
+![ROC and PR Curves](outputs/baseline_roc_pr_curve.png)
+
 ### TextCNN
 
 - **Embedding Layer**: 200-dimensional word embeddings
