@@ -203,10 +203,10 @@ The ROC curve with an AUC of 0.82 demonstrates good discriminatory ability, sign
 
 ### Key Findings
 
-1. **Loss Function**: BCE Loss outperforms Focal Loss on this dataset, indicating that the class imbalance is mild
-2. **Learning Rate**: 0.001 provides optimal balance between convergence speed and stability
-3. **Batch Size**: 32 achieves the best performance with stable training
-4. **Architecture**: TextCNN is recommended for this task due to its efficiency and comparable accuracy
+1. **Loss Function (BiLSTM)**: BCE Loss outperforms Focal Loss on this dataset, indicating that the class imbalance is mild
+2. **Learning Rate (BiLSTM)**: 0.001 provides optimal balance between convergence speed and stability
+3. **Batch Size (BiLSTM)**: 32 achieves the best performance with stable training
+4. **Architecture Comparison**: TextCNN achieves comparable accuracy to BiLSTM-Attention (~6.5x faster training speed) and is recommended for this task
 
 ## Evaluation Metrics
 

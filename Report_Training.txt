@@ -221,28 +221,7 @@ The hyperparameter configuration for the TextCNN model is summarized as follows:
 | Min Token Frequency    | 2                      |
 +------------------------+------------------------+
 
-The TextCNN architecture uses three parallel convolutional filters of sizes 3, 4, and 5, each producing 128 feature maps that are max-pooled and concatenated before classification. The model uses 200-dimensional word embeddings initialized randomly during training, dropout regularization of 0.35 to prevent overfitting, and optimal hyperparameters identified through systematic ablation studies.
-
-
-4.2.3 Loss Function Comparison
-
-The same loss function comparison experiment was conducted for the TextCNN model to evaluate whether the benefits of Focal Loss are architecture-dependent. Using the same hyperparameters (learning rate of 0.001, batch size of 32), the TextCNN model demonstrates similar performance patterns to the BiLSTM-Attention model when comparing BCE Loss and Focal Loss.
-
-The experimental results for the TextCNN model are consistent with the BiLSTM findings. BCE Loss achieves superior performance compared to Focal Loss, with the model reaching approximately 74% test accuracy when using standard cross-entropy compared to approximately 67% when using Focal Loss. This consistency across both architectures further confirms that the class imbalance in the dataset is mild and does not warrant the additional complexity of Focal Loss for this particular task. The similarity in behavior suggests that the performance gap between BCE and Focal Loss is primarily due to the loss function design rather than architectural differences.
-
-
-4.2.4 Learning Rate Ablation
-
-The same learning rate ablation study was conducted for the TextCNN model to determine whether the optimal learning rate identified for the BiLSTM-Attention model (0.001) also applies to the convolutional architecture. The TextCNN model demonstrates consistent behavior across different learning rate settings, with performance following a similar pattern to the BiLSTM-Attention model.
-
-For the TextCNN model, the learning rate of 0.0001 results in underfitting behavior similar to the BiLSTM, with test accuracy around 65% and slow convergence. The learning rate of 0.001 achieves optimal performance with approximately 74% test accuracy and stable convergence. The learning rate of 0.01 shows signs of slight overfitting with decreased test performance, while the learning rate of 0.1 demonstrates severe overfitting. The consistency in optimal learning rate selection (0.001 for both architectures) suggests that this learning rate is robust and appropriate for the fake news detection task regardless of the specific model architecture used.
-
-
-4.2.5 Batch Size Ablation
-
-The batch size ablation study was also conducted for the TextCNN model using the same five batch sizes: 8, 16, 32, 64, and 128. The TextCNN model demonstrates similar patterns to the BiLSTM-Attention model in terms of batch size effects on training stability and final performance.
-
-The batch size of 8 results in unstable training with lower accuracy, while batch sizes of 16 and 64 achieve moderate performance. The batch size of 32 achieves the best performance with stable convergence, similar to the BiLSTM-Attention model. The batch size of 128 achieves comparable performance with slightly faster training times per epoch. Based on these findings, the batch size of 32 is selected as the default configuration for the TextCNN model as well, ensuring consistency and comparability between the two architectures.
+The TextCNN architecture uses three parallel convolutional filters of sizes 3, 4, and 5, each producing 128 feature maps that are max-pooled and concatenated before classification. The model uses 200-dimensional word embeddings initialized randomly during training, dropout regularization of 0.35 to prevent overfitting, and employs the optimal hyperparameters identified from the comprehensive BiLSTM-Attention ablation studies (learning rate of 0.001, batch size of 32, BCE loss). This approach ensures fair comparison between the two architectures while avoiding redundant experiments.
 
 
 4.3 Architecture Comparison and Discussion
