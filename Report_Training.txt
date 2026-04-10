@@ -155,6 +155,10 @@ The proximity of many incorrect predictions to the 0.5 decision threshold sugges
 
 [Insert Figure: baseline_confusion_matrix.png showing the confusion matrix with true labels on the vertical axis and predicted labels on the horizontal axis, displaying the counts of true positives, false positives, true negatives, and false negatives]
 
+The confusion matrix reveals the distribution of predictions across the four possible outcomes. The model achieves an overall test accuracy of approximately 74.6%, with a precision of 71.7% and recall of 58.7% for the positive class (fake news). This indicates that while the model correctly identifies approximately three-quarters of all test samples, it is more conservative in predicting fake news, resulting in a higher rate of false negatives (real news incorrectly classified as fake) compared to false positives. The balanced nature of the dataset and the similar performance across both classes suggest that the model has learned meaningful discriminative patterns without exhibiting strong class bias.
+
+The ROC AUC score of 0.82 indicates good discriminatory ability, as the model achieves an area under the curve significantly above the 0.5 random chance baseline. The PR AUC score of 0.77 further confirms the model's effectiveness, particularly given that precision-recall curves are more informative for binary classification tasks. These metrics collectively demonstrate that the BiLSTM-Attention model has learned to distinguish between real and fake news with reasonable accuracy, though there remains room for improvement in reducing false negatives and increasing recall for the fake news class.
+
 [Insert Figure: baseline_roc_pr_curve.png showing the Receiver Operating Characteristic (ROC) curve with the false positive rate on the x-axis and the true positive rate on the y-axis, along with the Area Under the Curve (AUC) score]
 
 

@@ -168,7 +168,11 @@ The baseline BiLSTM-Attention model shows smooth convergence over 6 epochs, with
 
 ![Confusion Matrix](outputs/baseline_confusion_matrix.png)
 
+The confusion matrix shows the model achieves approximately 74.6% test accuracy with precision of 71.7% and recall of 58.7% for fake news detection. The model correctly identifies most test samples, though it tends to be conservative in predicting fake news, resulting in a higher rate of false negatives compared to false positives. The balanced performance across both classes indicates the model has learned meaningful discriminative patterns without strong class bias.
+
 ![ROC and PR Curves](outputs/baseline_roc_pr_curve.png)
+
+The ROC curve with an AUC of 0.82 demonstrates good discriminatory ability, significantly above the 0.5 random chance baseline. The PR curve with an AUC of 0.77 further confirms the model's effectiveness. These metrics collectively show the BiLSTM-Attention model successfully distinguishes between real and fake news with reasonable accuracy.
 
 ### TextCNN
 
